@@ -1,0 +1,9 @@
+---
+import FormDishes from "./components/FormDishes";
+
+const user = Astro.locals.auth.user;
+---
+
+<div>
+  <FormDishes client:only />
+</div>
