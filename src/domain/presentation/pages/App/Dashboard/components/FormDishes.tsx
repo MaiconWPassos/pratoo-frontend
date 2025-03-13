@@ -1,17 +1,10 @@
 import { Button } from "@/external/components/ui/button";
 
 import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/external/components/ui/card";
-import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/external/components/ui/form";
 import { Input } from "@/external/components/ui/input";
@@ -21,9 +14,10 @@ import { z } from "zod";
 
 import { api } from "@/domain/lib/api";
 import { exceptionValidation } from "@/domain/lib/error";
+import constants from "@/domain/styles/constants";
 import Cookies from "js-cookie";
 import { Plus, Trash } from "lucide-react";
-import constants from "@/domain/styles/constants";
+import { useState } from "react";
 
 const formSchema = z.object({
   ingredients: z.array(
@@ -35,6 +29,7 @@ const formSchema = z.object({
 });
 
 export default function FormDishes() {
+  const [dish, setDish] = useState<Dish | null>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,15 +49,25 @@ export default function FormDishes() {
     }
   );
 
+  const handleAddIngredint = () => {
+    if (fields.length >= 3) {
+      alert(`Limite de ingredients atingido`);
+      return;
+    }
+    append({
+      id: crypto.randomUUID(),
+      title: "",
+    });
+  };
+
   async function onSubmit(formData: z.infer<typeof formSchema>) {
     try {
-      const { data } = await api.post<AuthResponse>("/auth/login", {
+      setDish(null);
+      const { data } = await api.post<ResponseApi<Dish>>("/dishes", {
         ingredients: formData.ingredients.map((ing) => ing.title),
       });
 
-      Cookies.set("__session", data.token, { expires: 7 });
-
-      window.location.href = "/app/dashboard";
+      setDish(data.data);
     } catch (error) {
       const { message } = exceptionValidation(error);
       form.setError("ingredients", {
@@ -109,25 +114,39 @@ export default function FormDishes() {
               )}
             />
           ))}
-          <Button
-            className="w-fit"
-            variant="default"
-            size="sm"
-            onClick={() =>
-              append({
-                id: crypto.randomUUID(),
-                title: "",
-              })
-            }
-          >
-            <Plus /> Adicionar novo ingrediente
-          </Button>
+          {fields.length < 3 && (
+            <Button
+              className="w-fit"
+              variant="default"
+              size="sm"
+              onClick={handleAddIngredint}
+            >
+              <Plus /> Adicionar novo ingrediente
+            </Button>
+          )}
         </div>
 
-        <Button type="submit" variant="brand" className="w-full">
-          Gerar minha receita
+        <Button
+          type="submit"
+          variant="brand"
+          className="w-full items-center"
+          disabled={form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting ? (
+            "Gerando.."
+          ) : (
+            <>
+              Gerar minha receita
+              <div className="flex items-center gap-2 ">
+                <img src="/ovo-coin.svg" alt="ovo-coin" className="w-8" />
+                <p>2</p>
+              </div>
+            </>
+          )}
         </Button>
       </form>
+
+      {JSON.stringify(dish)}
     </Form>
   );
 }

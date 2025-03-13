@@ -6,27 +6,25 @@ export const onRequest = defineMiddleware(async (context, next) => {
     user: null,
   };
 
-  if (!context.url.pathname.includes("/app")) return await next();
+  if (context.url.pathname.includes("/auth")) return await next();
 
   const rtkByCookies = context.cookies.get("__session")?.value;
 
-  console.log("RTK:", rtkByCookies);
-
   if (rtkByCookies) {
     try {
-      const response = await api.get("/auth/me", {
+      const response = await api.get<ResponseApi<User>>("/auth/me", {
         headers: { Authorization: `Bearer ${rtkByCookies}` },
       });
 
       context.locals.auth = {
-        user: response.data.user,
+        user: response.data.data,
       };
     } catch (error) {
       console.log("Request Error:", error);
-      return context.redirect("/");
+      return context.redirect("/auth/login");
     }
   } else {
-    return context.redirect("/");
+    return context.redirect("/auth/login");
   }
 
   const result = await next();

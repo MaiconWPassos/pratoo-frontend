@@ -25,6 +25,7 @@ import { z } from "zod";
 import Cookies from "js-cookie";
 import { api } from "@/domain/lib/api";
 import { exceptionValidation } from "@/domain/lib/error";
+import GoogleLoginButton from "./GoogleLoginButton";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -46,14 +47,16 @@ export default function FormLogin() {
 
   async function onSubmit(formData: z.infer<typeof formSchema>) {
     try {
-      const { data } = await api.post<AuthResponse>("/auth/login", {
+      const {
+        data: { data },
+      } = await api.post<ResponseApi<AuthResponse>>("/auth/login", {
         email: formData.email,
         password: formData.password,
       });
 
       Cookies.set("__session", data.token, { expires: 7 });
 
-      window.location.href = "/app/dashboard";
+      window.location.href = "/";
     } catch (error) {
       const { message } = exceptionValidation(error);
       form.setError("password", {
@@ -111,10 +114,19 @@ export default function FormLogin() {
               )}
             />
           </CardContent>
-          <CardFooter className="w-full">
+          <CardFooter className="w-full flex-col gap-2">
             <Button type="submit" variant="brand" className="w-full">
               Entrar
             </Button>
+            <GoogleLoginButton />
+            <div className="mt-8 w-full">
+              <p className="font-light">
+                Não tem conta?{" "}
+                <Button variant="link" className="p-0" asChild>
+                  <a href="/auth/register">Cadastre-se</a>
+                </Button>
+              </p>
+            </div>
           </CardFooter>
         </form>
       </Form>

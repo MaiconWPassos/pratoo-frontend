@@ -1,5 +1,6 @@
 interface ImportMetaEnv {
   readonly PUBLIC_API: string;
+  readonly PUBLIC_FIREBASE_CONFIG: string;
   // more env variables...
 }
 

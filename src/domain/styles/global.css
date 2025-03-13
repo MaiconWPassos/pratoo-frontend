@@ -123,3 +123,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .no-spinner::-webkit-inner-spin-button,
+  .no-spinner::-webkit-outer-spin-button {
+    @apply appearance-none;
+  }
+
+  .no-spinner {
+    @apply [appearance:textfield];
+  }
+}

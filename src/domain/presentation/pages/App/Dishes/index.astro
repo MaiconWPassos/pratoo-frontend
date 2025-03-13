@@ -1,14 +1,7 @@
 ---
 import { api } from "@/domain/lib/api";
-import { cn } from "@/domain/lib/utils";
 import { Button } from "@/external/components/ui/button";
 import { Skeleton } from "@/external/components/ui/skeleton";
-
-interface Props {
-  initialDishes?: Dish[];
-  currentPage: number;
-  totalPages: number;
-}
 
 async function fetchDishes(page = 1) {
   try {

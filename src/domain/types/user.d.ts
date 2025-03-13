@@ -2,9 +2,9 @@ interface User {
   id: number;
   name: string;
   email: string;
-  stripeCustomerId: string;
-  stripeSubscriptionId: string;
-  stripeSubscriptionStatus: string;
+  documentNumber: string;
+  cellphone: string;
+  credits: number;
   createdAt: Date;
   updatedAt: Date;
 }
